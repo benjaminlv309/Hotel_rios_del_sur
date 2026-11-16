@@ -2,7 +2,7 @@ Instalar Django.
 
 Tener actualizado Python.
 
-Abrir Xampp, prender las opciones de Mysql y Apache, luego el archivo sql de este repositorio importarlo en la pagina de PhpMyAdmin.
+Abrir Xampp, prender las opciones de Mysql y Apache, luego el archivo sql de este repositorio importarlo en la pagina de PhpMyAdmin al seleccionar la opcion de admin en Mysql.
 
 Ejecutar el comando: py manage.py runserver, para ejecutar el proyecto y poder usarlo en el navegador.
 
