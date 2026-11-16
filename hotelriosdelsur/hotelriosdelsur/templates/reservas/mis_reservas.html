@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block title %}
+Mis reservas | Hotel Ríos del Sur
+{% endblock %}
+{% block content %}
+
+<div class="container py-5">
+    <h2 class="mb-4">Mis reservas</h2>
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert
+            {% if message.tags == 'success' %}
+                alert-success
+            {% elif message.tags == 'error' %}
+                alert-danger
+            {% else %}
+                alert-info
+            {% endif %}
+        ">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>N.º</th>
+                    <th>Habitación</th>
+                    <th>Tipo</th>
+                    <th>Entrada</th>
+                    <th>Salida</th>
+                    <th>Noches</th>
+                    <th>Precio total</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reserva in reservas %}
+                <tr>
+                    <td>{{ reserva.id }}</td>
+                    <td>{{ reserva.habitacion.numero }}</td>
+                    <td>{{ reserva.habitacion.tipo }}</td>
+                    <td>
+                        {{ reserva.fecha_entrada|date:"d/m/Y" }}
+                    </td>
+                    <td>
+                        {{ reserva.fecha_salida|date:"d/m/Y" }}
+                    </td>
+                    <td>
+                        {{ reserva.cantidad_noches }}
+                    </td>
+                    <td>
+                        {% if reserva.precio_total != None %}
+                        ${{ reserva.precio_total|floatformat:0 }}
+                        {% else %}
+                        No registrado
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if reserva.estado == 'pendiente' %}
+                        <span class="badge bg-warning text-dark">Pendiente</span>
+                        {% elif reserva.estado == 'confirmada' %}
+                        <span class="badge bg-success">Confirmada</span>
+                        {% elif reserva.estado == 'en_estadia' %}
+                        <span class="badge bg-primary">En estadía</span>
+                        {% elif reserva.estado == 'finalizada' %}
+                        <span class="badge bg-secondary">Finalizada</span>
+                        {% else %}
+                        <span class="badge bg-danger">Cancelada</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if reserva.estado == 'pendiente' or reserva.estado == 'confirmada' %}
+                        {% if reserva.fecha_entrada > hoy %}
+                        <form method="POST" action="{% url 'cancelar_reserva_cliente' reserva.id %}"
+                            onsubmit="return confirm('¿Estás seguro de cancelar esta reserva?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm">Cancelar</button>
+                        </form>
+                        {% else %}
+                        <span class="text-muted">Sin acciones</span>
+                        {% endif %}
+                        {% else %}
+                        <span class="text-muted">Sin acciones</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" class="text-center">Todavía no has realizado reservas.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <a href="{% url 'lista_habitaciones' %}" class="btn btn-primary mt-3">Ver habitaciones</a>
+</div>
+{% endblock %}

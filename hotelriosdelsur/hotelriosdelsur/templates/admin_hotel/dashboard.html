@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% block title %}Panel de administración | Hotel Ríos del Sur{% endblock %}
+{% block content %}
+
+<div class="admin-dashboard container py-4 py-lg-5">
+
+    <header class="dash-header">
+        <div>
+            <span class="dash-eyebrow">Administración</span>
+            <h1 class="dash-title">Panel de gestión</h1>
+            <p class="dash-subtitle">Bienvenido, {{ user.first_name|default:user.username }}. Resumen operativo del hotel.</p>
+        </div>
+        <div class="dash-actions">
+            <a href="{% url 'crear_reserva' %}" class="btn btn-dark">Nueva reserva</a>
+            <a href="{% url 'crear_habitacion' %}" class="btn btn-outline-dark">Nueva habitación</a>
+        </div>
+    </header>
+
+    <section class="dash-section" aria-labelledby="habitaciones-heading">
+        <div class="dash-section-heading">
+            <h2 id="habitaciones-heading">Habitaciones</h2>
+            <a href="{% url 'administrar_habitaciones' %}" class="dash-link">Ver habitaciones</a>
+        </div>
+        <div class="dash-panel">
+            <div class="dash-metrics">
+                <div class="dash-metric">
+                    <span class="dash-label">Total de habitaciones</span>
+                    <strong class="dash-value">{{ total_habitaciones }}</strong>
+                    <span class="dash-note">Registradas en el sistema</span>
+                </div>
+                <div class="dash-metric">
+                    <span class="dash-label"><i class="dash-dot dot-success"></i>Habilitadas</span>
+                    <strong class="dash-value">{{ habitaciones_habilitadas }}</strong>
+                    <span class="dash-note">Disponibles para reservar</span>
+                </div>
+                <div class="dash-metric">
+                    <span class="dash-label"><i class="dash-dot dot-danger"></i>Fuera de servicio</span>
+                    <strong class="dash-value">{{ habitaciones_fuera_servicio }}</strong>
+                    <span class="dash-note">Requieren atención</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="dash-section" aria-labelledby="reservas-heading">
+        <div class="dash-section-heading">
+            <h2 id="reservas-heading">Reservas y estadías</h2>
+            <a href="{% url 'administrar_reservas' %}" class="dash-link">Ver reservas</a>
+        </div>
+        <div class="dash-panel">
+            <div class="dash-metrics">
+                <div class="dash-metric">
+                    <span class="dash-label">Total de reservas</span>
+                    <strong class="dash-value">{{ total_reservas }}</strong>
+                    <span class="dash-note">Todas las reservas</span>
+                </div>
+                <div class="dash-metric">
+                    <span class="dash-label"><i class="dash-dot dot-warning"></i>Pendientes</span>
+                    <strong class="dash-value">{{ reservas_pendientes }}</strong>
+                    <span class="dash-note">Esperan confirmación</span>
+                </div>
+                <div class="dash-metric">
+                    <span class="dash-label"><i class="dash-dot dot-success"></i>Confirmadas</span>
+                    <strong class="dash-value">{{ reservas_confirmadas }}</strong>
+                    <span class="dash-note">Reservas aprobadas</span>
+                </div>
+                <div class="dash-metric">
+                    <span class="dash-label"><i class="dash-dot dot-info"></i>Estadías activas</span>
+                    <strong class="dash-value">{{ estadias_activas }}</strong>
+                    <span class="dash-note">Huéspedes alojados</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="dash-section" aria-labelledby="finanzas-heading">
+        <div class="dash-section-heading">
+            <h2 id="finanzas-heading">Resumen financiero</h2>
+        </div>
+        <div class="dash-panel">
+            <div class="dash-metrics dash-metrics-2">
+                <div class="dash-metric">
+                    <span class="dash-label">Confirmadas y en estadía</span>
+                    <strong class="dash-value">${{ ingresos_confirmados|floatformat:0 }}</strong>
+                    <span class="dash-note">Valor de reservas confirmadas y estadías en curso</span>
+                </div>
+                <div class="dash-metric">
+                    <span class="dash-label">Estadías finalizadas</span>
+                    <strong class="dash-value">${{ ingresos_finalizados|floatformat:0 }}</strong>
+                    <span class="dash-note">Total registrado en reservas finalizadas</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="dash-section" aria-labelledby="modulos-heading">
+        <div class="dash-section-heading">
+            <h2 id="modulos-heading">Módulos de gestión</h2>
+        </div>
+        <div class="dash-panel">
+            <ul class="dash-modules">
+                <li>
+                    <div>
+                        <h3>Habitaciones</h3>
+                        <p>Registro, consulta y modificación de las habitaciones del hotel.</p>
+                    </div>
+                    <a href="{% url 'administrar_habitaciones' %}" class="btn btn-sm btn-outline-dark">Administrar</a>
+                </li>
+                <li>
+                    <div>
+                        <h3>Huéspedes</h3>
+                        <p>Gestión de los datos de las personas alojadas.</p>
+                    </div>
+                    <a href="{% url 'administrar_huespedes' %}" class="btn btn-sm btn-outline-dark">Administrar</a>
+                </li>
+                <li>
+                    <div>
+                        <h3>Reservas</h3>
+                        <p>Consulta, registro y confirmación de reservas de habitaciones.</p>
+                    </div>
+                    <a href="{% url 'administrar_reservas' %}" class="btn btn-sm btn-outline-dark">Administrar</a>
+                </li>
+                <li>
+                    <div>
+                        <h3>Estadías</h3>
+                        <p>Control del check-in y check-out de los huéspedes.</p>
+                    </div>
+                    <a href="{% url 'administrar_estadias' %}" class="btn btn-sm btn-outline-dark">Administrar</a>
+                </li>
+            </ul>
+        </div>
+    </section>
+</div>
+{% endblock %}

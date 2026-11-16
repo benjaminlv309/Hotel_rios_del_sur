@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+Habitaciones | Hotel Ríos del Sur
+{% endblock %}
+{% block content %}
+
+<div class="container py-5">
+    <h1 class="text-center mb-3">Nuestras habitaciones</h1>
+    <p class="text-center text-muted mb-5">Conoce las habitaciones disponibles en nuestro hotel.</p>
+    <div class="card shadow-sm mb-5">
+        <div class="card-body">
+            <h5 class="mb-3">Buscar disponibilidad</h5>
+            <form method="GET" action="{% url 'lista_habitaciones' %}">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-5">
+                        <label for="fecha_entrada" class="form-label">Fecha de entrada</label>
+                        <input type="date" id="fecha_entrada" name="fecha_entrada" class="form-control"
+                            value="{{ fecha_entrada }}" required>
+                    </div>
+                    <div class="col-md-5">
+                        <label for="fecha_salida" class="form-label">Fecha de salida</label>
+                        <input type="date" id="fecha_salida" name="fecha_salida" class="form-control"
+                            value="{{ fecha_salida }}" required>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">Buscar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% if error %}
+    <div class="alert alert-danger">
+        {{ error }}
+    </div>
+    {% endif %}
+    <div class="row g-4">
+        {% for habitacion in habitaciones %}
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                {% if habitacion.imagen %}
+                <img src="{% static 'img/' %}{{ habitacion.imagen }}" class="card-img-top"
+                    alt="Habitación {{ habitacion.numero }}"
+                    style="height: 220px; object-fit: cover;">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">Habitación {{ habitacion.numero }}</h5>
+                    <p class="card-text">
+                        <strong>Tipo:</strong> {{ habitacion.tipo }}
+                    </p>
+                    <p class="card-text">
+                        <strong>Capacidad:</strong> {{ habitacion.capacidad }} personas
+                    </p>
+                    <p class="card-text">
+                        <strong>Precio por noche:</strong>${{ habitacion.precio|floatformat:0 }}
+                    </p>
+                    {% if habitacion.estado == 'habilitada' %}
+                    <span class="badge bg-success">Habilitada</span>
+                    <div class="mt-3">
+                        <a href="{% url 'reservar_habitacion' habitacion.id %}?fecha_entrada={{ fecha_entrada|urlencode }}&fecha_salida={{ fecha_salida|urlencode }}"
+                            class="btn btn-primary w-100">Reservar habitación</a>
+                    </div>
+                    {% else %}
+                    <span class="badge bg-danger">Fuera de servicio</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <div class="alert alert-info">No se encontraron habitaciones disponibles para las fechas seleccionadas.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

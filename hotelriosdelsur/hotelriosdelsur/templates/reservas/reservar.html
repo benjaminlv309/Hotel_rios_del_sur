@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% block title %}
+Reservar habitación | Hotel Ríos del Sur
+{% endblock %}
+{% block content %}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="mb-4">Reservar habitación</h2>
+                    <div class="alert alert-info">
+                        <h5>
+                            Habitación {{ habitacion.numero }}
+                        </h5>
+                        <p class="mb-1">
+                            <strong>Tipo:</strong>{{ habitacion.tipo }}
+                        </p>
+                        <p class="mb-1">
+                            <strong>Capacidad:</strong>{{ habitacion.capacidad }} personas
+                        </p>
+                        <p class="mb-0">
+                            <strong>Precio por noche:</strong>${{ habitacion.precio|floatformat:0 }}
+                        </p>
+                    </div>
+                    <form method="POST">
+                        {% csrf_token %}
+                        {% for campo in formulario %}
+                        <div class="mb-3">
+                            <label class="form-label" for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+                            {{ campo }}
+                            {% for error in campo.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        {% endfor %}
+                        {% for error in formulario.non_field_errors %}
+                        <div class="alert alert-danger">{{ error }}</div>
+                        {% endfor %}
+                        <div class="card bg-light mb-4">
+                            <div class="card-body">
+                                <h5 class="mb-3">Resumen de la estadía</h5>
+                                <p class="mb-2">
+                                    <strong>Noches:</strong>
+                                    <span id="cantidadNoches">0</span>
+                                </p>
+                                <p class="mb-0">
+                                    <strong>Precio total:</strong>
+                                    <span id="precioTotal" class="fw-bold text-success">$0</span>
+                                </p>
+                                <div id="mensajeFechas" class="text-danger small mt-2"></div>
+                            </div>
+                        </div>
+                        <p class="text-muted small">Tu reserva quedará pendiente hasta que sea confirmada por el hotel.
+                        </p>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">Solicitar reserva</button>
+                            <a href="{% url 'lista_habitaciones' %}" class="btn btn-secondary">Volver</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{ precio_noche|json_script:"precio-noche-data" }}
+{% endblock %}
+{% block scripts %}
+<script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const entrada = document.getElementById('id_fecha_entrada');
+        const salida = document.getElementById('id_fecha_salida');
+        const cantidadNoches = document.getElementById('cantidadNoches');
+        const precioTotal = document.getElementById('precioTotal');
+        const mensajeFechas = document.getElementById('mensajeFechas');
+        const precioPorNoche = Number(
+            JSON.parse(
+                document.getElementById('precio-noche-data').textContent
+            )
+        );
+        const formatoPrecio = new Intl.NumberFormat('es-CL', {
+            style: 'currency',
+            currency: 'CLP',
+            maximumFractionDigits: 0
+        });
+        function calcularTotal() {
+            cantidadNoches.textContent = '0';
+            precioTotal.textContent = formatoPrecio.format(0);
+            mensajeFechas.textContent = '';
+            if (!entrada.value || !salida.value) {
+                return;
+            }
+            const fechaEntrada = new Date(entrada.value + 'T00:00:00Z');
+            const fechaSalida = new Date(salida.value + 'T00:00:00Z');
+            const diferencia = fechaSalida - fechaEntrada;
+            const noches = diferencia / (1000 * 60 * 60 * 24);
+            if (noches <= 0) {
+                mensajeFechas.textContent =
+                    'La fecha de salida debe ser posterior a la entrada.';
+                return;
+            }
+            const total = noches * precioPorNoche;
+            cantidadNoches.textContent = noches;
+            precioTotal.textContent = formatoPrecio.format(total);
+        }
+        if (entrada && salida) {
+            entrada.addEventListener('change', calcularTotal);
+            salida.addEventListener('change', calcularTotal);
+            calcularTotal();
+        }
+    });
+</script>
+{% endblock %}

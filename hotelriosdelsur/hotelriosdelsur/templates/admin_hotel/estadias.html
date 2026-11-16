@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block title %}
+Gestión de estadías | Hotel Ríos del Sur
+{% endblock %}
+{% block content %}
+
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Gestión de estadías</h2>
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary">Volver al panel</a>
+    </div>
+    <p class="text-muted mb-4">
+        Administra el ingreso y salida de los huéspedes.
+    </p>
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert
+                {% if message.tags == 'success' %}
+                    alert-success
+                {% elif message.tags == 'error' %}
+                    alert-danger
+                {% else %}
+                    alert-info
+                {% endif %}
+            ">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Reserva</th>
+                    <th>Huésped</th>
+                    <th>Habitación</th>
+                    <th>Entrada</th>
+                    <th>Salida</th>
+                    <th>Estado</th>
+                    <th>Check-in</th>
+                    <th>Check-out</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reserva in reservas %}
+                <tr>
+                    <td>{{ reserva.id }}</td>
+                    <td>{{ reserva.huesped }}</td>
+                    <td>{{ reserva.habitacion.numero }}</td>
+                    <td>
+                        {{ reserva.fecha_entrada|date:"d/m/Y" }}
+                    </td>
+                    <td>
+                        {{ reserva.fecha_salida|date:"d/m/Y" }}
+                    </td>
+                    <td>
+                        {% if reserva.estado == 'confirmada' %}
+                        <span class="badge bg-success">Confirmada</span>
+                        {% elif reserva.estado == 'en_estadia' %}
+                        <span class="badge bg-primary">En estadía</span>
+                        {% elif reserva.estado == 'finalizada' %}
+                        <span class="badge bg-secondary">Finalizada</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if reserva.fecha_checkin %}
+                        {{ reserva.fecha_checkin|date:"d/m/Y H:i" }}
+                        {% else %}
+                        -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if reserva.fecha_checkout %}
+                        {{ reserva.fecha_checkout|date:"d/m/Y H:i" }}
+                        {% else %}
+                        -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if reserva.estado == 'confirmada' %}
+                        <form method="POST" action="{% url 'realizar_checkin' reserva.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary btn-sm">Check-in</button>
+                        </form>
+                        {% elif reserva.estado == 'en_estadia' %}
+                        <form method="POST" action="{% url 'realizar_checkout' reserva.id %}"
+                            onsubmit="return confirm('¿Confirmar salida del huésped?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success btn-sm">Check-out</button>
+                        </form>
+                        {% else %}
+                        <span class="text-muted">Sin acciones</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" class="text-center">No hay estadías registradas.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
